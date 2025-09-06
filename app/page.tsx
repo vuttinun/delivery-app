@@ -1,6 +1,7 @@
 "use client"
 
 import type React from "react"
+
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -10,31 +11,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Truck, LogIn, Clock } from "lucide-react"
 import Dashboard from "@/components/dashboard"
 
+const DRIVERS = ["อรุณรัตน์", "นิทัศน์", "มัณฑนา", "ธัญญา มีน", "สมชาย", "วิชัย", "ประยุทธ", "สุรชัย"]
+
 export default function DeliveryApp() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [driverName, setDriverName] = useState("")
   const [startMileage, setStartMileage] = useState("")
   const [currentDate, setCurrentDate] = useState("")
-  const [drivers, setDrivers] = useState<string[]>([]) // สร้าง state สำหรับเก็บรายชื่อคนขับ
-  const [error, setError] = useState<string | null>(null) // สำหรับจัดการข้อผิดพลาด
 
   useEffect(() => {
-    // ดึงข้อมูลคนขับจาก API
-    async function fetchDrivers() {
-      try {
-        const response = await fetch("/api/drivers/route.ts") // แทนที่ด้วย path ของ API route
-        if (!response.ok) {
-          throw new Error("ไม่สามารถดึงรายชื่อคนขับได้")
-        }
-        const data = await response.json()
-        setDrivers(data) // เก็บข้อมูล drivers จาก API
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "เกิดข้อผิดพลาดในการดึงข้อมูล")
-      }
-    }
-    fetchDrivers()
-
-    // ตรวจสอบสถานะ login
+    // Check if already logged in today
     const loginData = localStorage.getItem("deliveryLogin")
     const today = new Date().toISOString().split("T")[0]
 
@@ -87,10 +73,6 @@ export default function DeliveryApp() {
     setStartMileage("")
   }
 
-  if (error) {
-    return <div>เกิดข้อผิดพลาด: {error}</div>
-  }
-
   if (isLoggedIn) {
     return <Dashboard driverName={driverName} onLogout={handleLogout} />
   }
@@ -122,7 +104,7 @@ export default function DeliveryApp() {
                 <SelectValue placeholder="เลือกชื่อคนขับ" />
               </SelectTrigger>
               <SelectContent>
-                {drivers.map((driver) => (
+                {DRIVERS.map((driver) => (
                   <SelectItem key={driver} value={driver} className="mobile-large">
                     {driver}
                   </SelectItem>
